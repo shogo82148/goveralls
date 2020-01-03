@@ -61,6 +61,7 @@ var (
 	show        = flag.Bool("show", false, "Show which package is being tested")
 	customJobId = flag.String("jobid", "", "Custom set job token")
 	jobNumber   = flag.String("jobnumber", "", "Custom set job number")
+	stdout      = flag.Bool("stdout", false, "print the response from coveralls")
 )
 
 // usage supplants package flag's Usage variable
@@ -400,6 +401,10 @@ func process() error {
 
 	if res.StatusCode != 200 {
 		return fmt.Errorf("Bad response status from coveralls: %d\n%s", res.StatusCode, bodyBytes)
+	}
+	if *stdout {
+		_, err := os.Stdout.Write(bodyBytes)
+		return err
 	}
 	var response Response
 	if err = json.Unmarshal(bodyBytes, &response); err != nil {
